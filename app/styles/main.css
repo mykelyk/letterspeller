@@ -1,0 +1,33 @@
+/* Space out content a bit */
+body {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+#container {
+  width: 800px;
+}
+
+#output .letter {
+  text-transform: uppercase;
+}
+
+#output .letter,
+#output .word {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+#output .word {
+  width: 98%;
+}
+
+button.simple-player.stop i.play,
+button.simple-player.play i.stop {
+  display: none;
+}
+
+#main-player button.pause i.play,
+#main-player button.play i.pause {
+  display: none;
+}
