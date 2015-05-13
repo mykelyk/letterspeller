@@ -135,7 +135,6 @@ Speller.prototype = {
   }
 };
 
-var $container = $('#container');
 var $input = $('#input');
 var $output = $('#output');
 var $mainPlayer = $('#main-player');
@@ -165,7 +164,7 @@ $input.trigger('keyup');
 
 $output.on('click', 'button.simple-player.play', function(e) {
   e.preventDefault();
-  speller.stop()
+  speller.stop();
 
   var $this = $(this);
   var index = $this.data('index');
@@ -213,7 +212,7 @@ $mainPlayer.on('click', 'button.pause', function(e) {
   $this.removeClass('pause');
   $this.addClass('play');
 
-  speller.pause()
+  speller.pause();
 });
 
 $mainPlayer.on('click', 'button.stop', function(e) {
