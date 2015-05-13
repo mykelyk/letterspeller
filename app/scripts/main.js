@@ -54,12 +54,17 @@ Speller.prototype = {
   SPEAKING: 'speaking',
   PAUSED: 'paused',
   STOPPED: 'stopped',
+  uid: 0,
 
   _isWhiteSpace: function(text) {
     return text.trim() === '';
   },
 
   speak: function(text, options) {
+    this.uid++;
+    var speakId = this.uid;
+
+    console.log('speak', this.state, this.SPEAKING);
     this.stop();
     var utterance = new SpeechSynthesisUtterance(text);
     utterance.voiceURI = 'native';
@@ -69,10 +74,12 @@ Speller.prototype = {
     var self = this;
     utterance.onend = function(e) {
       console.log('onend', e);
-      self.state = this.STOPPED;
+      if (speakId === this.uid) {
+        self.state = self.STOPPED;
 
-      if (onend) {
-        return onend(e);
+        if (onend) {
+          return onend(e);
+        }
       }
     };
 
@@ -82,16 +89,19 @@ Speller.prototype = {
   },
 
   resume: function() {
+    console.log('resume', this.state, this.SPEAKING);
     this.state = this.SPEAKING;
     speechSynthesis.resume();
   },
 
   pause: function() {
+    console.log('pause', this.state, this.PAUSED);
     this.state = this.PAUSED;
     speechSynthesis.pause();
   },
 
   stop: function() {
+    console.log('stop', this.state, this.STOPPED);
     this.state = this.STOPPED;
     speechSynthesis.cancel();
   },
@@ -104,7 +114,6 @@ Speller.prototype = {
   },
 
   spellAt: function(index, length, options) {
-    console.log(index, length);
     if (index == null) {
       index = 0;
       if (length == null) {
