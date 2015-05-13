@@ -1,0 +1,25 @@
+{
+  "bitwise": true,
+  "browser": true,
+  "camelcase": true,
+  "curly": true,
+  "eqeqeq": true,
+  "eqnull": true,
+  "esnext": true,
+  "immed": true,
+  "indent": 2,
+  "jquery": true,
+  "latedef": true,
+  "newcap": true,
+  "noarg": true,
+  "node": true,
+  "quotmark": "single",
+  "strict": true,
+  "undef": true,
+  "unused": true,
+  "globals": {
+    "speechSynthesis": false,
+    "SpeechSynthesisUtterance": false,
+    "_": false
+  }
+}
