@@ -47,7 +47,8 @@ var dictionary = {
 function Speller(dictionary, text) {
   this.dictionary = dictionary;
   this.text = text;
-  this.state = this.STOPPED;
+  this._state = this.STOPPED;
+  this.emitter = new EventEmitter2();
 }
 
 Speller.prototype = {
@@ -60,49 +61,72 @@ Speller.prototype = {
     return text.trim() === '';
   },
 
+  setState: function(newState) {
+    console.log(this._state, '->', newState);
+    var oldState = this._state;
+    if (oldState === newState || newState === this.PAUSED && oldState === this.STOPPED) {
+      return;
+    }
+
+    this._state = newState;
+    if (newState === this.SPEAKING && oldState === this.STOPPED) {
+      this.emitter.emit('play');
+    }
+    if (newState === this.SPEAKING && oldState === this.PAUSED) {
+      this.emitter.emit('resume');
+    }
+    if (newState === this.STOPPED) {
+      this.emitter.emit('stop');
+    }
+    if (newState === this.PAUSED) {
+      this.emitter.emit('pause');
+    }
+  },
+
+  getState: function() {
+    return this._state;
+  },
+
   speak: function(text, options) {
     this.uid++;
     var speakId = this.uid;
 
-    console.log('speak', this.state, this.SPEAKING);
     this.stop();
+
+    if (this.uid % 2 === 0) {
+      // don't run the same string twice (chrome bug)
+      text += ' ';
+    }
+
     var utterance = new SpeechSynthesisUtterance(text);
     utterance.voiceURI = 'native';
     _.assign(utterance, options);
 
-    var onend = utterance.onend;
     var self = this;
     utterance.onend = function(e) {
       console.log('onend', e);
-      if (speakId === this.uid) {
-        self.state = self.STOPPED;
-
-        if (onend) {
-          return onend(e);
-        }
+      if (speakId === self.uid) {
+        self.setState(self.STOPPED);
       }
     };
 
     console.log('speak', text, options);
-    self.state = this.SPEAKING;
+    this.setState(this.SPEAKING);
     speechSynthesis.speak(utterance);
   },
 
   resume: function() {
-    console.log('resume', this.state, this.SPEAKING);
-    this.state = this.SPEAKING;
+    this.setState(this.SPEAKING);
     speechSynthesis.resume();
   },
 
   pause: function() {
-    console.log('pause', this.state, this.PAUSED);
-    this.state = this.PAUSED;
+    this.setState(this.PAUSED);
     speechSynthesis.pause();
   },
 
   stop: function() {
-    console.log('stop', this.state, this.STOPPED);
-    this.state = this.STOPPED;
+    this.setState(this.STOPPED);
     speechSynthesis.cancel();
   },
 
@@ -173,51 +197,61 @@ $input.trigger('keyup');
 
 $output.on('click', 'button.simple-player.play', function(e) {
   e.preventDefault();
-  speller.stop();
-
   var $this = $(this);
   var index = $this.data('index');
 
-  speller.spellAt(index, null, {
-    onend: function() {
-      $this.removeClass('stop');
-      $this.addClass('play');
-    }
-  });
-
   $this.removeClass('play');
   $this.addClass('stop');
+
+  speller.stop();
+
+  speller.emitter.once('stop', function() {
+    $this.removeClass('stop');
+    $this.addClass('play');
+  });
+
+  speller.spellAt(index);
 });
 
 $output.on('click', 'button.simple-player.stop', function(e) {
   e.preventDefault();
+  var $this = $(this);
+
+  $this.removeClass('stop');
+  $this.addClass('play');
+
   speller.stop();
 });
 
 
 $mainPlayer.on('click', 'button.play', function(e) {
   e.preventDefault();
-
   var $this = $(this);
+
   $this.removeClass('play');
   $this.addClass('pause');
 
-  if (speller.state === this.PAUSED) {
+
+  if (speller.getState() !== speller.PAUSED) {
+    speller.stop();
+  }
+
+  speller.emitter.once('stop', function() {
+    $this.removeClass('pause');
+    $this.addClass('play');
+  });
+
+  if (speller.getState() === speller.PAUSED) {
     speller.resume();
   } else {
-    speller.spellAt(null, null, {
-      onend: function() {
-        $this.removeClass('pause');
-        $this.addClass('play');
-      }
-    });
+    speller.spellAt();
   }
 });
 
 $mainPlayer.on('click', 'button.pause', function(e) {
   e.preventDefault();
-
   var $this = $(this);
+
   $this.removeClass('pause');
   $this.addClass('play');
 
