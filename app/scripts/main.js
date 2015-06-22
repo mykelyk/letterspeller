@@ -1,4 +1,5 @@
 /* jshint devel:true */
+/* global EventEmitter2 */
 
 $(function() {
 'use strict';
