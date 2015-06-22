@@ -2,6 +2,7 @@
 'use strict';
 
 var gulp = require('gulp');
+var rsync = require('gulp-rsync');
 var $ = require('gulp-load-plugins')();
 var browserSync = require('browser-sync');
 var reload = browserSync.reload;
@@ -107,6 +108,22 @@ gulp.task('wiredep', function () {
 
 gulp.task('build', ['jshint', 'html', 'images', 'fonts', 'extras'], function () {
   return gulp.src('dist/**/*').pipe($.size({title: 'build', gzip: true}));
+});
+
+gulp.task('deploy', ['build'], function() {
+  return gulp.src('dist/*')
+    .pipe(rsync({
+      root: 'dist',
+      username: 'letterspeller',
+      hostname: 'letterspeller.com',
+      destination: '/home/letterspeller/www',
+      progress: true,
+      emptyDirectories: true,
+      times: true,
+      compress: true,
+      recursive: true,
+      clean: true
+    }));
 });
 
 gulp.task('default', ['clean'], function () {
