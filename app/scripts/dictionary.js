@@ -1,3 +1,8 @@
+/* jshint devel:true */
+/*jshint unused:false*/
+
+'use strict';
+
 function isWhiteSpace(text) {
   return text.trim() === '';
 }
@@ -14,7 +19,7 @@ Dictionary.prototype.getWord = function(letter){
   return (lowercased in this._letterToWord) ? this._letterToWord[lowercased]
        : isWhiteSpace(lowercased) ? null
        : letter;
-}
+};
 
 var dictionaryList = [
   new Dictionary('Italia', 'IT', {

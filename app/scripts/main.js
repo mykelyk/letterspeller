@@ -1,5 +1,7 @@
 /* jshint devel:true */
 /* global EventEmitter2 */
+/* global isWhiteSpace */
+/* global dictionaryList */
 
 $(function() {
 'use strict';
