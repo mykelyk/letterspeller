@@ -6,44 +6,6 @@ $(function() {
 
 var __slice = [].slice;
 
-var dictionary = {
-  a: 'Alfa',
-  b: 'Bravo',
-  c: 'Charlie',
-  d: 'Delta',
-  e: 'Echo',
-  f: 'Foxtrot',
-  g: 'Golf',
-  h: 'Hotel',
-  i: 'India',
-  j: 'Juliet',
-  k: 'Kilo',
-  l: 'Lima',
-  m: 'Mike',
-  n: 'November',
-  o: 'Oscar',
-  p: 'Papa',
-  q: 'Quebec',
-  r: 'Romeo',
-  s: 'Sierra',
-  t: 'Tango',
-  u: 'Uniform',
-  v: 'Victor',
-  w: 'Whiskey',
-  x: 'X-ray',
-  y: 'Yankee',
-  z: 'Zulu',
-  0: 'Zero',
-  1: 'One',
-  2: 'Two',
-  3: 'Three',
-  4: 'Four',
-  5: 'Five',
-  6: 'Six',
-  7: 'Seven',
-  8: 'Eight',
-  9: 'Nine'
-};
 
 function Speller(dictionary, text) {
   this.dictionary = dictionary;
@@ -57,10 +19,6 @@ Speller.prototype = {
   PAUSED: 'paused',
   STOPPED: 'stopped',
   uid: 0,
-
-  _isWhiteSpace: function(text) {
-    return text.trim() === '';
-  },
 
   setState: function(newState) {
     console.log(this._state, '->', newState);
@@ -100,7 +58,10 @@ Speller.prototype = {
     }
 
     var utterance = new SpeechSynthesisUtterance(text);
-    utterance.voiceURI = 'native';
+    //utterance.voiceURI = 'native';
+    utterance.lang = 'it-IT';
+    utterance.rate = 0.8;
+    utterance.pitch = 1;
     _.assign(utterance, options);
 
     var self = this;
@@ -132,7 +93,7 @@ Speller.prototype = {
   },
 
   spellLetter: function(letter, options) {
-    if (!this._isWhiteSpace(letter)) {
+    if (!isWhiteSpace(letter)) {
       var word = this.getWord(letter);
       this.speak(word, options);
     }
@@ -151,7 +112,7 @@ Speller.prototype = {
     var words = [];
     for (var i = 0; i < length; i++) {
       var letter = this.text[index + i];
-      if (!this._isWhiteSpace(letter)) {
+      if (!isWhiteSpace(letter)) {
         var word = this.getWord(letter);
         words.push(word);
       }
@@ -162,10 +123,7 @@ Speller.prototype = {
   },
 
   getWord: function(letter) {
-    var lowercased = letter.toLowerCase();
-    return (lowercased in this.dictionary) ? this.dictionary[lowercased]
-         : this._isWhiteSpace(lowercased) ? null
-         : letter;
+    return this.dictionary.getWord(letter);
   }
 };
 
@@ -175,10 +133,13 @@ var $mainPlayer = $('#main-player');
 
 var template = _.template($('#output-template').html());
 
-var speller = new Speller(dictionary, '');
+var speller = new Speller(dictionaryList[0], '');
 
 $input.on('keyup keydown', function() {
-  speller = new Speller(dictionary, $input.val());
+  var inputText = $input.val();
+  localStorage.setItem('inputText', inputText);
+
+  speller = new Speller(dictionaryList[0], inputText);
   var letters = __slice.call(speller.text);
 
   $output.html($.map(letters, function(letter, index) {
