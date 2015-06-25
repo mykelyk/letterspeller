@@ -22,45 +22,7 @@ Dictionary.prototype.getWord = function(letter){
 };
 
 var dictionaryList = [
-  new Dictionary('Italia', 'IT', {
-    a: 'Ancona',
-    b: 'Bologna',
-    c: 'Catania',
-    d: 'Domodossola',
-    e: 'Empoli',
-    f: 'Firenze',
-    g: 'Genova',
-    h: 'Hotel',
-    i: 'Imola',
-    j: 'Joker',
-    k: 'Kappa',
-    l: 'Livorno',
-    m: 'Milano',
-    n: 'Napoli',
-    o: 'Otranto',
-    p: 'Palermo',
-    q: 'Quaderno',
-    r: 'Roma',
-    s: 'Savona',
-    t: 'Torino',
-    u: 'Udine',
-    v: 'Venezia',
-    w: 'Washington',
-    x: 'Xilofono',
-    y: 'Ipsilon',
-    z: 'Zara',
-    0: 'Zero',
-    1: 'One',
-    2: 'Two',
-    3: 'Three',
-    4: 'Four',
-    5: 'Five',
-    6: 'Six',
-    7: 'Seven',
-    8: 'Eight',
-    9: 'Nine'
-  }),
-  new Dictionary('NATO', 'US', {
+  new Dictionary('NATO', 'NATO', {
     a: 'Alfa',
     b: 'Bravo',
     c: 'Charlie',
@@ -98,7 +60,45 @@ var dictionaryList = [
     8: 'Eight',
     9: 'Nine'
     }),
-  new Dictionary('Navy', 'US', {
+  new Dictionary('Italia', 'ITALIA', {
+    a: 'Ancona',
+    b: 'Bologna',
+    c: 'Catania',
+    d: 'Domodossola',
+    e: 'Empoli',
+    f: 'Firenze',
+    g: 'Genova',
+    h: 'Hotel',
+    i: 'Imola',
+    j: 'Joker',
+    k: 'Kappa',
+    l: 'Livorno',
+    m: 'Milano',
+    n: 'Napoli',
+    o: 'Otranto',
+    p: 'Palermo',
+    q: 'Quaderno',
+    r: 'Roma',
+    s: 'Savona',
+    t: 'Torino',
+    u: 'Udine',
+    v: 'Venezia',
+    w: 'Washington',
+    x: 'Xilofono',
+    y: 'Ipsilon',
+    z: 'Zara',
+    0: 'Zero',
+    1: 'One',
+    2: 'Two',
+    3: 'Three',
+    4: 'Four',
+    5: 'Five',
+    6: 'Six',
+    7: 'Seven',
+    8: 'Eight',
+    9: 'Nine'
+  }),
+  new Dictionary('Navy', 'NAVY', {
     a: 'Apples',
     b: 'Butter',
     c: 'Charlie',
@@ -138,4 +138,7 @@ var dictionaryList = [
   })
 ];
 
-
+var dictionaryByCode = {};
+_.each(dictionaryList, function(dictionary) {
+  dictionaryByCode[dictionary.code] = dictionary;
+});

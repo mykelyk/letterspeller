@@ -8,17 +8,17 @@ body {
   width: 800px;
 }
 
-#output .letter {
+#spelling .letter {
   text-transform: uppercase;
 }
 
-#output .letter,
-#output .word {
+#spelling .letter,
+#spelling .word {
   padding-top: 12px;
   padding-bottom: 12px;
 }
 
-#output .word {
+#spelling .word {
   width: 98%;
 }
 

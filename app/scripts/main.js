@@ -2,6 +2,7 @@
 /* global EventEmitter2 */
 /* global isWhiteSpace */
 /* global dictionaryList */
+/* global dictionaryByCode */
 
 $(function() {
 'use strict';
@@ -21,6 +22,24 @@ Speller.prototype = {
   PAUSED: 'paused',
   STOPPED: 'stopped',
   uid: 0,
+
+  setText: function(newText) {
+    this.text = newText;
+    this.emitter.emit('change');
+  },
+
+  getText: function() {
+    return this.text;
+  },
+
+  setDictionary: function(newDictionary) {
+    this.dictionary = newDictionary;
+    this.emitter.emit('change');
+  },
+
+  getDictionary: function() {
+    return this.dictionary;
+  },
 
   setState: function(newState) {
     console.log(this._state, '->', newState);
@@ -130,34 +149,67 @@ Speller.prototype = {
 };
 
 var $input = $('#input');
-var $output = $('#output');
+var $output = $('#spelling');
 var $mainPlayer = $('#main-player');
+var $dictionaryChooser = $('#dictionary-chooser');
+var $dictionaryChooserBtn = $('#dictionary-chooser-btn');
 
-var template = _.template($('#output-template').html());
+var spellingTemplate = _.template($('#spelling-template').html());
+var dropdownItemTemplate = _.template($('#dropdown-item-template').html());
 
-var speller = new Speller(dictionaryList[0], '');
+var initialDictionaryCode = localStorage.getItem('dictionaryCode') || dictionaryList[0].code;
+var initialInputText = localStorage.getItem('inputText') || '';
+
+$input.val(initialInputText);
+
+var speller = new Speller(dictionaryByCode[initialDictionaryCode], initialInputText);
+speller.emitter.on('change', function() {
+  localStorage.setItem('dictionaryCode', speller.getDictionary().code);
+  localStorage.setItem('inputText', speller.getText());
+  refreshSpelling();
+});
+
+$dictionaryChooserBtn.text(speller.getDictionary().name);
+$mainPlayer.show();
+
+_.each(dictionaryList, function(dictionary) {
+  var dropdownItem = dropdownItemTemplate({label: dictionary.name, value: dictionary.code});
+  $dictionaryChooser.append(dropdownItem);
+});
+
+$dictionaryChooser.on('click', 'a', function(e) {
+  e.preventDefault();
+  var $this = $(this);
+
+  var code = $this.data('value');
+  var dictionary = dictionaryByCode[code];
+  $dictionaryChooserBtn.text(dictionary.name);
+
+  speller.setDictionary(dictionary);
+});
 
 $input.on('keyup keydown', function() {
   var inputText = $input.val();
-  localStorage.setItem('inputText', inputText);
+  speller.setText(inputText);
+});
+$input.trigger('keyup');
 
-  speller = new Speller(dictionaryList[0], inputText);
-  var letters = __slice.call(speller.text);
+function refreshSpelling() {
+  var letters = __slice.call(speller.getText());
 
-  $output.html($.map(letters, function(letter, index) {
+  $output.html(_.map(letters, function(letter, index) {
     var word = speller.getWord(letter);
     if (word == null) {
       return '';
     } else {
-      return template({
+      return spellingTemplate({
         index: index,
         letter: letter,
         word: word
       });
     }
   }).join('\n'));
-});
-$input.trigger('keyup');
+}
 
 $output.on('click', 'button.simple-player.play', function(e) {
   e.preventDefault();
