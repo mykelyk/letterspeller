@@ -110,7 +110,7 @@ gulp.task('build', ['jshint', 'html', 'images', 'fonts', 'extras'], function () 
   return gulp.src('dist/**/*').pipe($.size({title: 'build', gzip: true}));
 });
 
-gulp.task('deploy', ['build'], function() {
+gulp.task('deploy-only', function() {
   return gulp.src('dist/*')
     .pipe(rsync({
       root: 'dist',
@@ -125,6 +125,8 @@ gulp.task('deploy', ['build'], function() {
       clean: true
     }));
 });
+
+gulp.task('deploy',['build', 'deploy-only']);
 
 gulp.task('default', ['clean'], function () {
   gulp.start('build');
