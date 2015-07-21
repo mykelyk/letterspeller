@@ -139,15 +139,15 @@ gulp.task('deploy-rsync', function() {
 
 gulp.task('deploy-only', ['deploy-rsync'], function() {
   return gulpSSH.shell([
-    'find /home/letterspeller/www -t f -exec chmod 0644 "{}" +',
-    'find /home/letterspeller/www -t d -exec chmod 0755 "{}" +',
+    'find /home/letterspeller/www -type f -exec chmod 0644 "{}" +',
+    'find /home/letterspeller/www -type d -exec chmod 0755 "{}" +',
   ]);
 });
 
 gulp.task('deploy', ['build'], function() {
-  gulp.start('deploy-only');
+  return gulp.start('deploy-only');
 });
 
 gulp.task('default', ['clean'], function () {
-  gulp.start('build');
+  return gulp.start('build');
 });
