@@ -4,6 +4,9 @@
 /* global dictionaryList */
 /* global dictionaryByCode */
 
+// Load voices
+speechSynthesis.getVoices();
+
 $(function() {
 'use strict';
 
@@ -68,6 +71,8 @@ Speller.prototype = {
   },
 
   speak: function(text, options) {
+    var self = this;
+
     this.uid++;
     var speakId = this.uid;
 
@@ -79,13 +84,16 @@ Speller.prototype = {
     }
 
     var utterance = new SpeechSynthesisUtterance(text);
-    //utterance.voiceURI = 'native';
-    utterance.lang = 'it-IT';
+    speechSynthesis.getVoices().forEach(function(voice) {
+      if (self.dictionary.lang === voice.lang) {
+        utterance.lang = voice.lang;
+      }
+    });
+
     utterance.rate = 0.8;
     utterance.pitch = 1;
     _.assign(utterance, options);
 
-    var self = this;
     utterance.onend = function(e) {
       console.log('onend', e);
       if (speakId === self.uid) {

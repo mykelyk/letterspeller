@@ -7,9 +7,10 @@ function isWhiteSpace(text) {
   return text.trim() === '';
 }
 
-function Dictionary(name, code, letterToWord) {
+function Dictionary(name, code, lang, letterToWord) {
   this.name = name;
   this.code = code;
+  this.lang = lang;
   this._letterToWord = letterToWord;
 }
 
@@ -22,7 +23,7 @@ Dictionary.prototype.getWord = function(letter){
 };
 
 var dictionaryList = [
-  new Dictionary('NATO', 'NATO', {
+  new Dictionary('NATO', 'NATO', 'en-US', {
     a: 'Alfa',
     b: 'Bravo',
     c: 'Charlie',
@@ -60,7 +61,7 @@ var dictionaryList = [
     8: 'Eight',
     9: 'Nine'
     }),
-  new Dictionary('Italia', 'ITALIA', {
+  new Dictionary('Italia', 'ITALIA', 'it-IT', {
     a: 'Ancona',
     b: 'Bologna',
     c: 'Catania',
@@ -98,7 +99,7 @@ var dictionaryList = [
     8: 'Eight',
     9: 'Nine'
   }),
-  new Dictionary('Navy', 'NAVY', {
+  new Dictionary('Navy', 'NAVY', 'en-US', {
     a: 'Apples',
     b: 'Butter',
     c: 'Charlie',
