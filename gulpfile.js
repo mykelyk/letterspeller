@@ -1,11 +1,21 @@
 /* global -$ */
 'use strict';
 
+var fs = require('fs');
 var gulp = require('gulp');
 var rsync = require('gulp-rsync');
 var $ = require('gulp-load-plugins')();
 var browserSync = require('browser-sync');
 var reload = browserSync.reload;
+var GulpSSH = require('gulp-ssh');
+
+var gulpSSH = new GulpSSH({
+  sshConfig: {
+    username: 'letterspeller',
+    host: 'letterspeller.com',
+    privateKey: fs.readFileSync(process.env.HOME + '/.ssh/letterspeller_rsa'),
+  }
+});
 
 gulp.task('styles', function () {
   return gulp.src('app/styles/main.css')
@@ -111,7 +121,7 @@ gulp.task('build', ['jshint', 'html', 'images', 'fonts', 'extras'], function () 
   return gulp.src('dist/**/*').pipe($.size({title: 'build', gzip: true}));
 });
 
-gulp.task('deploy-only', function() {
+gulp.task('deploy-rsync', function() {
   return gulp.src('dist/*')
     .pipe(rsync({
       root: 'dist',
@@ -125,6 +135,13 @@ gulp.task('deploy-only', function() {
       recursive: true,
       clean: true
     }));
+});
+
+gulp.task('deploy-only', ['deploy-rsync'], function() {
+  return gulpSSH.shell([
+    'find /home/letterspeller/www -t f -exec chmod 0644 "{}" +',
+    'find /home/letterspeller/www -t d -exec chmod 0755 "{}" +',
+  ]);
 });
 
 gulp.task('deploy', ['build'], function() {
