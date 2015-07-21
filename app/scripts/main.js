@@ -4,8 +4,10 @@
 /* global dictionaryList */
 /* global dictionaryByCode */
 
-// Load voices
-speechSynthesis.getVoices();
+if (window.speechSynthesis) {
+  // Load voices
+  speechSynthesis.getVoices();
+}
 
 $(function() {
 'use strict';
