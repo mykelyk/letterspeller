@@ -127,7 +127,9 @@ gulp.task('deploy-only', function() {
     }));
 });
 
-gulp.task('deploy',['build', 'deploy-only']);
+gulp.task('deploy', ['build'], function() {
+  gulp.start('deploy-only');
+});
 
 gulp.task('default', ['clean'], function () {
   gulp.start('build');
