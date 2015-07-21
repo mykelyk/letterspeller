@@ -38,6 +38,7 @@ Speller.prototype = {
   setDictionary: function(newDictionary) {
     this.dictionary = newDictionary;
     this.emitter.emit('change');
+    this.stop();
   },
 
   getDictionary: function() {
