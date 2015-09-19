@@ -111,7 +111,7 @@ gulp.task('serve', ['styles', 'fonts'], function () {
 
 // inject bower components
 gulp.task('wiredep', function () {
-  gulp.src('app/*.html')
+  return gulp.src('app/*.html')
     .pipe(wiredep.stream({
       ignorePath: /^(\.\.\/)*\.\./
     }))
@@ -119,12 +119,23 @@ gulp.task('wiredep', function () {
 });
 
 gulp.task('build', ['jshint', 'html', 'images', 'fonts', 'extras'], function () {
-  return gulp.src('dist/**/*').pipe($.size({title: 'build', gzip: true}));
+  return gulp.src('dist/**/*')
+    .pipe($.size({title: 'build', gzip: true}));
 });
 
 gulp.task('deploy', ['build'], function() {
-  return gulp.src('./dist/**')
-    .pipe(s3(aws));
+  gulp.src(['./dist/**', '!./dist/**.html'])
+    .pipe(s3(aws, {
+      headers: {'Cache-Control': 'max-age=315360000, no-transform, public'}
+    }));
+  gulp.src('./dist/**.html')
+    .pipe(s3(aws, {
+      headers: {
+        'Cache-Control': 'no-cache, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': 'Sat, 26 Jul 1997 05:00:00 GMT'
+      }
+    }));
 });
 
 gulp.task('default', ['clean'], function () {
