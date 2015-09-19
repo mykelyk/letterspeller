@@ -1,27 +1,25 @@
 /* global -$ */
 'use strict';
 
+var $ = require('gulp-load-plugins')();
+var autoprefixer = require('autoprefixer-core');
+var browserSync = require('browser-sync');
+var del = require('del');
 var fs = require('fs');
 var gulp = require('gulp');
+var mainBowerFiles = require('main-bower-files');
 var rsync = require('gulp-rsync');
-var $ = require('gulp-load-plugins')();
-var browserSync = require('browser-sync');
-var reload = browserSync.reload;
-var GulpSSH = require('gulp-ssh');
+var s3 = require('gulp-s3');
+var wiredep = require('wiredep');
 
-var gulpSSH = new GulpSSH({
-  sshConfig: {
-    username: 'letterspeller',
-    host: 'letterspeller.com',
-    privateKey: fs.readFileSync(process.env.HOME + '/.ssh/letterspeller_rsa'),
-  }
-});
+var reload = browserSync.reload;
+var aws = require('./aws.json');
 
 gulp.task('styles', function () {
   return gulp.src('app/styles/main.css')
     .pipe($.sourcemaps.init())
     .pipe($.postcss([
-      require('autoprefixer-core')({browsers: ['last 2 versions', '> 1%']})
+      autoprefixer({browsers: ['last 2 versions', '> 1%']})
     ]))
     .pipe($.sourcemaps.write())
     .pipe(gulp.dest('.tmp/styles'))
@@ -62,7 +60,7 @@ gulp.task('images', function () {
 });
 
 gulp.task('fonts', function () {
-  return gulp.src(require('main-bower-files')({
+  return gulp.src(mainBowerFiles({
     filter: '**/*.{eot,svg,ttf,woff,woff2}'
   }).concat('app/fonts/**/*'))
     .pipe(gulp.dest('.tmp/fonts'))
@@ -78,7 +76,7 @@ gulp.task('extras', function () {
   }).pipe(gulp.dest('dist'));
 });
 
-gulp.task('clean', require('del').bind(null, ['.tmp', 'dist']));
+gulp.task('clean', del.bind(null, ['.tmp', 'dist']));
 
 gulp.task('serve', ['styles', 'fonts'], function () {
   browserSync({
@@ -108,10 +106,8 @@ gulp.task('serve', ['styles', 'fonts'], function () {
 
 // inject bower components
 gulp.task('wiredep', function () {
-  var wiredep = require('wiredep').stream;
-
   gulp.src('app/*.html')
-    .pipe(wiredep({
+    .pipe(wiredep.stream({
       ignorePath: /^(\.\.\/)*\.\./
     }))
     .pipe(gulp.dest('app'));
@@ -121,31 +117,9 @@ gulp.task('build', ['jshint', 'html', 'images', 'fonts', 'extras'], function () 
   return gulp.src('dist/**/*').pipe($.size({title: 'build', gzip: true}));
 });
 
-gulp.task('deploy-rsync', function() {
-  return gulp.src('dist/*')
-    .pipe(rsync({
-      root: 'dist',
-      username: 'letterspeller',
-      hostname: 'letterspeller.com',
-      destination: '/home/letterspeller/www',
-      progress: true,
-      emptyDirectories: true,
-      times: true,
-      compress: true,
-      recursive: true,
-      clean: true
-    }));
-});
-
-gulp.task('deploy-only', ['deploy-rsync'], function() {
-  return gulpSSH.shell([
-    'find /home/letterspeller/www -type f -exec chmod 0644 "{}" +',
-    'find /home/letterspeller/www -type d -exec chmod 0755 "{}" +',
-  ]);
-});
-
 gulp.task('deploy', ['build'], function() {
-  return gulp.start('deploy-only');
+  return gulp.src('./dist/**')
+    .pipe(s3(aws));
 });
 
 gulp.task('default', ['clean'], function () {
