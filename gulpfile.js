@@ -4,6 +4,7 @@
 var $ = require('gulp-load-plugins')();
 var autoprefixer = require('autoprefixer-core');
 var browserSync = require('browser-sync');
+var CacheBuster = require('gulp-cachebust');
 var del = require('del');
 var fs = require('fs');
 var gulp = require('gulp');
@@ -12,8 +13,9 @@ var rsync = require('gulp-rsync');
 var s3 = require('gulp-s3');
 var wiredep = require('wiredep');
 
-var reload = browserSync.reload;
 var aws = require('./aws.json');
+var cachebust = new CacheBuster();
+var reload = browserSync.reload;
 
 gulp.task('styles', function () {
   return gulp.src('app/styles/main.css')
@@ -40,10 +42,13 @@ gulp.task('html', ['styles'], function () {
   return gulp.src('app/*.html')
     .pipe(assets)
     .pipe($.if('*.js', $.uglify()))
+    .pipe($.if('*.js', cachebust.resources()))
     .pipe($.if('*.css', $.csso()))
+    .pipe($.if('*.css', cachebust.resources()))
     .pipe(assets.restore())
     .pipe($.useref())
     .pipe($.if('*.html', $.minifyHtml({conditionals: true, loose: true})))
+    .pipe($.if('*.html', cachebust.references()))
     .pipe(gulp.dest('dist'));
 });
 
