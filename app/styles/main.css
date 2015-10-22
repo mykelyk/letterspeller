@@ -1,11 +1,12 @@
 /* Space out content a bit */
 body {
-  padding-top: 20px;
+  padding-top: 10px;
   padding-bottom: 20px;
 }
 
-#container {
-  width: 800px;
+
+#main-player {
+  float: right;
 }
 
 #spelling .letter {
@@ -14,12 +15,20 @@ body {
 
 #spelling .letter,
 #spelling .word {
-  padding-top: 12px;
-  padding-bottom: 12px;
+  padding-top: 11px;
+}
+
+#spelling .letter {
+  padding-left: 20px;
 }
 
 #spelling .word {
-  width: 98%;
+  width: 87%;
+}
+
+#letter-player {
+  float: right;
+  margin-right: 5px;
 }
 
 button.simple-player.stop i.play,
@@ -30,4 +39,22 @@ button.simple-player.play i.stop {
 #main-player button.pause i.play,
 #main-player button.play i.pause {
   display: none;
+}
+
+.input-container,
+.main-player-container {
+  padding-right: 0px;
+  padding-left: 0px;
+}
+
+.panel-heading {
+  padding-right: 9px;
+}
+
+#container {
+  max-width: 768px;
+}
+
+#dictionary-chooser-btn {
+  min-width: 79px;
 }
