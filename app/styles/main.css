@@ -54,7 +54,3 @@ button.simple-player.play i.stop {
 #container {
   max-width: 768px;
 }
-
-#dictionary-chooser-btn {
-  min-width: 79px;
-}
