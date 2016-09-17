@@ -14,8 +14,7 @@ function Dictionary(name, code, lang, letterToWord) {
   this._letterToWord = letterToWord;
 }
 
-Dictionary.prototype.getWord = function(letter){
-
+Dictionary.prototype.getWord = function(letter) {
   var lowercased = letter.toLowerCase();
   return (lowercased in this._letterToWord) ? this._letterToWord[lowercased]
        : isWhiteSpace(lowercased) ? null
