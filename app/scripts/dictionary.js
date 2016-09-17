@@ -95,7 +95,7 @@ var dictionaryList = [
     '%': 'Percent Sign',
     '^': 'Caret'
     }),
-  new Dictionary('Italia', 'ITALIA', 'it-IT', {
+  new Dictionary('Italiano', 'ITALIA', 'it-IT', {
     'a': 'Ancona',
     'b': 'Bologna',
     'c': 'Catania',
